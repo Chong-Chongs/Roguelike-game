@@ -8,6 +8,7 @@ class Player {
     this.maxatk = 0.9;
     this.run = 35;
     this.doubleatks = 20;
+    this.defense = 35;
   }
 
   attack() {
@@ -22,12 +23,17 @@ class Player {
     return Math.random() * 100 < this.doubleatks;
   }
 
+  defenses() {
+    return Math.random() * 100 < this.defense;
+  }
+
   Stageclear() {
     this.hp += 50;
     this.minatk += 5;
     this.maxatk += 0.2;
     this.run += 3;
     this.doubleatks += 5;
+    this.defense += 3;
   }
 }
 
@@ -73,7 +79,9 @@ const battle = async (stage, player, monster) => {
     logs.forEach((log) => console.log(log));
 
     console.log(
-      chalk.green(`\n1. 공격한다 2. 더블 어택 ${player.doubleatks}% 3. 도망간다. ${player.run}%`)
+      chalk.green(
+        `\n1. 공격한다 2. 더블 어택 ${player.doubleatks}% 3. 도망간다. ${player.run}% 4. 방어 ${player.defense}%`
+      )
     );
     const choice = readlineSync.question("당신의 선택은? ");
 
@@ -108,6 +116,14 @@ const battle = async (stage, player, monster) => {
           return;
         } else {
           logs.push(chalk.blue(`Player가 도망가는데 실패하였습니다.`));
+          break;
+        }
+      case "4":
+        if (player.defenses()) {
+          logs.push(chalk.yellow(`Player가 방어에 성공해 피해를 받지 않습니다.`));
+          monsterdmg = 0;
+        } else {
+          logs.push(chalk.red(`Player가 방어에 실패합니다 몬스터에게 피해를 받습니다.`));
           break;
         }
     }
