@@ -34,14 +34,18 @@ class Player {
 class Monster {
   constructor(stage) {
     this.hp = 100 + stage * 50;
-    this.monsterminatk = 10 + stage * 5;
-    this.monstermaxatk = 0.5 + stage * 0.3;
+    this.monsterminatk = 8 + stage * 5;
+    this.monstermaxatk = 0.4 + stage * 0.3;
+    this.monsterdoubles = 17 + stage * 3;
   }
 
   attack() {
     return Math.round(
       Math.random() * (this.monsterminatk * this.monstermaxatk) + this.monsterminatk
     );
+  }
+  monsterdouble() {
+    return Math.random() * 100 < this.monsterdoubles;
   }
 }
 
@@ -53,7 +57,7 @@ function displayStatus(stage, player, monster) {
         `| 플레이어 HP: ${player.hp} | 최소뎀 ~ 최대뎀 : ${player.minatk} ~ ${player.maxatk}% |`
       ) +
       chalk.redBright(
-        `| 몬스터 HP: ${monster.hp} | 최소뎀 ~ 최대뎀 : ${monster.monsterminatk} ~ ${monster.monstermaxatk}% |`
+        `| 몬스터 HP: ${monster.hp} | 최소뎀 ~ 최대뎀 : ${monster.monsterminatk} ~ ${monster.monstermaxatk}% | 강력한 공격: ${monster.monsterdoubles}%`
       )
   );
   console.log(chalk.magentaBright(`=====================\n`));
@@ -81,12 +85,12 @@ const battle = async (stage, player, monster) => {
     switch (choice) {
       case "1":
         monster.hp -= playerdmg;
-        logs.push(chalk.green(`Player가 ${playerdmg}의 피해를 입혔습니다.`));
+        logs.push(chalk.green(`Player가 몬스터에게 ${playerdmg}의 피해를 입혔습니다.`));
         break;
 
       case "2":
         monster.hp -= playerdmg;
-        logs.push(chalk.green(`Player가 ${playerdmg}의 피해를 입혔습니다.`));
+        logs.push(chalk.green(`Player가 몬스터에게 ${playerdmg}의 피해를 입혔습니다.`));
 
         if (doubleatk) {
           monster.hp -= playerdmg;
@@ -94,7 +98,7 @@ const battle = async (stage, player, monster) => {
             chalk.green(`Player가 더블어택에 성공해 ${playerdmg}의 추가 피해를 입혔습니다.`)
           );
         } else {
-          logs.push(chalk.yellow(`더블어택 공격에 실패했습니다.`));
+          logs.push(chalk.blue(`Player가 더블어택 공격에 실패했습니다.`));
         }
         break;
 
@@ -110,6 +114,15 @@ const battle = async (stage, player, monster) => {
     if (monster.hp > 0) {
       player.hp -= monsterdmg;
       logs.push(chalk.red(`몬스터가 Player에게 ${monsterdmg}의 피해를 입혔습니다.`));
+
+      if (monster.monsterdouble()) {
+        player.hp -= monsterdmg;
+        logs.push(
+          chalk.red(`몬스터가 강력한 공격에 성공해 ${monsterdmg}의 추가 피해를 입혔습니다.`)
+        );
+      } else {
+        logs.push(chalk.blue(`몬스터가 강력한 공격에 실패했습니다.`));
+      }
     }
 
     if (player.hp <= 0) {
