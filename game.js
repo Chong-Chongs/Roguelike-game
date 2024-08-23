@@ -8,7 +8,7 @@ class Player {
     this.maxatk = 0.9;
     this.run = 35;
     this.doubleatks = 20;
-    this.defense = 35;
+    this.defense = 30;
   }
 
   attack() {
@@ -31,18 +31,18 @@ class Player {
     this.hp += 50;
     this.minatk += 5;
     this.maxatk += 0.2;
-    this.run += 3;
-    this.doubleatks += 5;
-    this.defense += 3;
+    this.run += -5;
+    this.doubleatks += -2;
+    this.defense += -2;
   }
 }
 
 class Monster {
   constructor(stage) {
     this.hp = 100 + stage * 50;
-    this.monsterminatk = 8 + stage * 5;
-    this.monstermaxatk = 0.4 + stage * 0.3;
-    this.monsterdoubles = 17 + stage * 3;
+    this.monsterminatk = 10 + stage * 5;
+    this.monstermaxatk = 0.4 + stage * 0.1;
+    this.monsterdoubles = 17 + stage * 1;
   }
 
   attack() {
@@ -60,10 +60,10 @@ function displayStatus(stage, player, monster) {
   console.log(
     chalk.cyanBright(`| Stage: ${stage} `) +
       chalk.blueBright(
-        `| 플레이어 HP: ${player.hp} | 최소뎀 ~ 최대뎀 : ${player.minatk} ~ ${player.maxatk}% |`
+        `| 플레이어 HP: ${player.hp} | 최소뎀 ~ 최대뎀 : ${player.minatk} ~ ${Math.round(player.maxatk * 10) / 10}% |`
       ) +
       chalk.redBright(
-        `| 몬스터 HP: ${monster.hp} | 최소뎀 ~ 최대뎀 : ${monster.monsterminatk} ~ ${monster.monstermaxatk}% | 강력한 공격: ${monster.monsterdoubles}%`
+        `| 몬스터 HP: ${monster.hp} | 최소뎀 ~ 최대뎀 : ${monster.monsterminatk} ~ ${Math.round(monster.monstermaxatk * 10) / 10}% | 강력한 공격: ${monster.monsterdoubles}%`
       )
   );
   console.log(chalk.magentaBright(`=====================\n`));
@@ -122,6 +122,7 @@ const battle = async (stage, player, monster) => {
         if (player.defenses()) {
           logs.push(chalk.yellow(`Player가 방어에 성공해 피해를 받지 않습니다.`));
           monsterdmg = 0;
+          player.hp += 20;
         } else {
           logs.push(chalk.red(`Player가 방어에 실패합니다 몬스터에게 피해를 받습니다.`));
           break;
@@ -168,7 +169,10 @@ export async function startGame() {
 
     if (player.hp > 0) {
       player.Stageclear();
-      player.hp = Math.min(player.hp + 80, 1000);
+      player.hp = Math.min(
+        player.hp + 80 + stage * 20 + Math.round(stage * Math.random() * 10),
+        1000
+      );
       console.log(chalk.green(`스테이지 ${stage} 클리어! 게임이 종료됩니다!`));
       stage++;
     } else {
